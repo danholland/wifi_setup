@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2019 Dan Holland
+ * All rights reserved
+ *
+ * Licensed under the Apache License, Version 2.0 (the ""License"");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an ""AS IS"" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 var locked = [
   'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsLW9wYWNpdHk9Ii4zIiBkPSJNMTIuMDEgMjEuNDlMMjMuNjQgN2MtLjQ1LS4zNC00LjkzLTQtMTEuNjQtNEM1LjI4IDMgLjgxIDYuNjYuMzYgN2wxMS42MyAxNC40OS4wMS4wMS4wMS0uMDF6Ii8+PHBhdGggZD0iTTAgMGgyNHYyNEgweiIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==',
   'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSJub25lIiBkPSJNMCAwaDI0djI0SDBWMHoiLz48cGF0aCBkPSJNMjMgMTZ2LTEuNWMwLTEuNC0xLjEtMi41LTIuNS0yLjVTMTggMTMuMSAxOCAxNC41VjE2Yy0uNSAwLTEgLjUtMSAxdjRjMCAuNS41IDEgMSAxaDVjLjUgMCAxLS41IDEtMXYtNGMwLS41LS41LTEtMS0xem0tMSAwaC0zdi0xLjVjMC0uOC43LTEuNSAxLjUtMS41czEuNS43IDEuNSAxLjVWMTZ6Ii8+PHBhdGggZD0iTTE1LjUgMTQuNWMwLTIuOCAyLjItNSA1LTUgLjQgMCAuNyAwIDEgLjFMMjMuNiA3Yy0uNC0uMy00LjktNC0xMS42LTRDNS4zIDMgLjggNi43LjQgN0wxMiAyMS41bDMuNS00LjN2LTIuN3oiIG9wYWNpdHk9Ii4zIi8+PHBhdGggZD0iTTYuNyAxNC45bDUuMyA2LjYgMy41LTQuM3YtMi42YzAtLjIgMC0uNS4xLS43LS45LS41LTIuMi0uOS0zLjYtLjktMyAwLTUuMSAxLjctNS4zIDEuOXoiLz48L3N2Zz4=',
