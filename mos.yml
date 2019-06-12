@@ -45,3 +45,7 @@ libs:
   - origin: https://github.com/mongoose-os-libs/rpc-common
   - origin: https://github.com/mongoose-os-libs/rpc-service-wifi
   - origin: https://github.com/mongoose-os-libs/mjs
+
+init_after:
+  - wifi
+  - http-server

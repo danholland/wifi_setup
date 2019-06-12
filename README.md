@@ -1,6 +1,7 @@
 # Wifi setup for Mongoose-OS
 
-Add mogs_wifi_rpc_init(); to mgos_app_init.
+Include mgos_wifi_setup_rpc.h
+Add mgos_wifi_setup_rpc_init(); to mgos_app_init.
 
 Go to http://192.168.4.1/wifi.html select a network and enter creds.
 
