@@ -18,7 +18,7 @@
 #include "mgos.h"
 #include "mgos_rpc.h"
 #include "mgos_wifi.h"
-#include "mgos_webserver.h"
+#include "mgos_webserver_gzip.h"
 #include "mgos_timers.h"
 
 #if CS_PLATFORM == CS_P_ESP32
@@ -160,7 +160,6 @@ bool mgos_wifi_setup_rpc_init(void)
   if (mgos_sys_config_get_wifi_rpc_enable())
   {
     mgos_wifi_setup_rpc_start();
-    webserver_start();
   }
   return true;
 }
