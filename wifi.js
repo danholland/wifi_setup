@@ -140,10 +140,6 @@ var Wifi = {
 
     httpRequest.onreadystatechange = function() {
       if (httpRequest.readyState !== XMLHttpRequest.DONE) {
-        console.log(
-          'rpcCall httpRequest readyState is NOT done!',
-          httpRequest.readyState
-        );
         return false;
       }
 
@@ -162,8 +158,6 @@ var Wifi = {
         }
         return;
       }
-      //var httpResponse = JSON.parse(httpRequest.responseText);
-      console.log('httpResponse', httpRequest.responseText);
 
       callback(JSON.parse(httpRequest.responseText));
     };
