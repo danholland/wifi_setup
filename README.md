@@ -1,6 +1,8 @@
-# JS-enabled demo Mongoose OS firmware
+# Wifi setup for Mongoose-OS
 
-This is the JS demo Mongoose OS app. It gets installed by default at
-[Mongoose OS installation step](https://mongoose-os.com/docs/). It has
-a lot of functionality enabled - cloud integrations, JavaScript engine, etc.
-Its main purpose is to demonstrate the capabilities of Mongoose OS.
+Add mogs_wifi_rpc_init(); to mgos_app_init.
+
+Go to http://192.168.4.1/wifi.html select a network and enter creds.
+
+TODO: If connected, show connection details
+TODO: Static IP
