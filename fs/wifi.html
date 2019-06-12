@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Configure Wifi Settings</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="/mini.css.gz" />
+    <script src="wifi.js.gz"></script>
+  </head>
+  <body>
+    <header>
+      <h5>Configure Wifi settings</h5>
+    </header>
+    <div id="wifiprogress" class="progress">
+      <div class="indeterminate"></div>
+    </div>
+    <div class="row cols-sm-12 cols-md-6">
+      <div id="scanning" class="card fluid info" style="display: none;">
+        <div class="section" style="padding: 0px;">
+          <p>
+            <span class="spinner primary list-view-icon"></span>Scanning for
+            wireless networks...
+          </p>
+        </div>
+      </div>
+      <div id="connecting" class="card fluid info" style="display: none;">
+        <div class="section" style="padding: 0px;">
+          <p>
+            <span class="spinner primary list-view-icon"></span>Attempting to
+            connect...
+          </p>
+        </div>
+      </div>
+      <div id="error" class="card fluid error" style="display: none;"></div>
+      <div id="info" class="card fluid info" style="display: none;"></div>
+      <div id="success" class="card fluid success" style="display: none;"></div>
+    </div>
+
+    <div class="row">
+      <div id="networkswrapper" class="col-sm-12 col-md-6">
+        <div class="list-view">
+          <ul id="networklist"></ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="row cols-sm-4">
+      <div><button class="primary" id="scan">Scan</button></div>
+    </div>
+    <div class="modal" id="credswrapper">
+      <div class="modal-content">
+        <fieldset>
+          <legend>Enter credentials</legend>
+          <div id="wuserwrapper">
+            <label for="wuser">Username</label>
+            <input type="text" name="wuser" id="wuser" autocomplete="off" />
+          </div>
+          <div id="wpasswrapper">
+            <label for="wpass">Password</label>
+            <input type="password" name="wpass" id="wpass" autocomplete="off" />
+          </div>
+        </fieldset>
+        <div class="row">
+          <div><button id="test">Test</button></div>
+          <div><button class="tertiary" id="save">Save</button></div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
