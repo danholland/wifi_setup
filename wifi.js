@@ -14,6 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+load('api_config.js');
+
 var locked = [
   'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsLW9wYWNpdHk9Ii4zIiBkPSJNMTIuMDEgMjEuNDlMMjMuNjQgN2MtLjQ1LS4zNC00LjkzLTQtMTEuNjQtNEM1LjI4IDMgLjgxIDYuNjYuMzYgN2wxMS42MyAxNC40OS4wMS4wMS4wMS0uMDF6Ii8+PHBhdGggZD0iTTAgMGgyNHYyNEgweiIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==',
   'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSJub25lIiBkPSJNMCAwaDI0djI0SDBWMHoiLz48cGF0aCBkPSJNMjMgMTZ2LTEuNWMwLTEuNC0xLjEtMi41LTIuNS0yLjVTMTggMTMuMSAxOCAxNC41VjE2Yy0uNSAwLTEgLjUtMSAxdjRjMCAuNS41IDEgMSAxaDVjLjUgMCAxLS41IDEtMXYtNGMwLS41LS41LTEtMS0xem0tMSAwaC0zdi0xLjVjMC0uOC43LTEuNSAxLjUtMS41czEuNS43IDEuNSAxLjVWMTZ6Ii8+PHBhdGggZD0iTTE1LjUgMTQuNWMwLTIuOCAyLjItNSA1LTUgLjQgMCAuNyAwIDEgLjFMMjMuNiA3Yy0uNC0uMy00LjktNC0xMS42LTRDNS4zIDMgLjggNi43LjQgN0wxMiAyMS41bDMuNS00LjN2LTIuN3oiIG9wYWNpdHk9Ii4zIi8+PHBhdGggZD0iTTYuNyAxNC45bDUuMyA2LjYgMy41LTQuM3YtMi42YzAtLjIgMC0uNS4xLS43LS45LS41LTIuMi0uOS0zLjYtLjktMyAwLTUuMSAxLjctNS4zIDEuOXoiLz48L3N2Zz4=',
@@ -76,6 +78,7 @@ var Wifi = {
     Wifi.Buttons.disableAll();
     Wifi.Scanning.show();
     Wifi.Progress.show();
+    let currSsid = Cfg.get('wifi.sta.ssid');
     Wifi.rpcCall(
       'POST',
       'Wifi.Scan',
@@ -112,13 +115,21 @@ var Wifi = {
 
             var authIcon = authInt > 0 ? locked[i] : unlocked[i];
             item.innerHTML =
-              '<img src="' +
-              authIcon +
-              '" class="list-view-icon" />' +
-              net.ssid;
-            item.onclick = function() {
-              Wifi.selectNetwork(net.ssid);
-            };
+              '<img src="' + authIcon + '" class="list-view-icon" />';
+
+            if (net.ssid === currSsid) {
+              item.innerHTML = item.innerHTML + '<b>' + net.ssid + '</b>';
+              item.classList.add('net_connected');
+              item.onclick = function() {
+                Wifi.editNetwork(net.ssid);
+              };
+            } else {
+              item.innerHTML = item.innerHTML + net.ssid;
+              item.onclick = function() {
+                Wifi.selectNetwork(net.ssid);
+              };
+            }
+
             netList.appendChild(item);
 
             Wifi.SSIDs.push(net.ssid);
@@ -212,6 +223,9 @@ var Wifi = {
     if (found) {
       Wifi.Buttons.enableAll();
     }
+  },
+  editNetwork: function(network) {
+    console.log(network);
   },
   Buttons: {
     _proto: function(elID, clickCB) {
