@@ -137,7 +137,7 @@ esp_err_t mgos_wifi_setup_rpc_start()
   return ESP_FAIL;
 }
 
-esp_err_t mgos_wifi_setup_rpc_init(void)
+bool mgos_wifi_setup_rpc_init(void)
 {
   LOG(LL_INFO, ("Wifi RPC handlers init"));
   if (mgos_sys_config_get_wifi_rpc_enable())
@@ -145,5 +145,5 @@ esp_err_t mgos_wifi_setup_rpc_init(void)
     mgos_wifi_setup_rpc_start();
     webserver_start();
   }
-  return ESP_OK;
+  return true;
 }

@@ -5,4 +5,4 @@ typedef void (*wifi_setup_test_cb_t)(bool result, char *ssid, char *password, vo
 
 esp_err_t mgos_wifi_setup_rpc_start();
 
-esp_err_t mgos_wifi_setup_rpc_init(void);
+bool mgos_wifi_setup_rpc_init(void);
