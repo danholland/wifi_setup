@@ -66,5 +66,40 @@
         </div>
       </div>
     </div>
+    <div class="modal" id="editwrapper">
+      <div class="modal-content">
+        <h4 class="section">Network Configuration</h4>
+        <div class="section">
+          <p id="editNetworkName"></p>
+        </div>
+        <div class="section">
+          <div class="collapse">
+            <input type="checkbox" id="collapse-ip-info" aria-hidden="true">
+            <label for="collapse-ip-info" aria-hidden="true">IP Information</label>
+            <div>
+              <table class="horizontal">
+                <thead>
+                <tr>
+                  <th>IP Address</th>
+                  <th>Network Mask</th>
+                  <th>Gateway</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border:0px;">
+                  <td id="tdIp" data-label="IP Address"></td>
+                  <td id="tdNm" data-label="Network Mask"></td>
+                  <td id="tdGw" data-label="Gateway"></td>
+                </tr>
+              </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="row"> 
+          <div><button id="forget">Forget</button></div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

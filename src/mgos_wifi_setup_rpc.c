@@ -20,6 +20,7 @@
 #include "mgos_wifi.h"
 #include "mgos_webserver_gzip.h"
 #include "mgos_timers.h"
+#include <tcpip_adapter.h>
 
 #if CS_PLATFORM == CS_P_ESP32
 #include "esp_wifi.h"
@@ -130,6 +131,27 @@ static void mgos_wifi_setup_save_rpc_handler(struct mg_rpc_request_info *ri, voi
   (void)fi;
 }
 
+static void mgos_wifi_setup_get_info_rpc_handler(struct mg_rpc_request_info *ri, void *cb_arg,
+                                             struct mg_rpc_frame_info *fi,
+                                             struct mg_str args)
+{
+  
+  
+  tcpip_adapter_ip_info_t ipInfo; 
+    	
+// IP address.
+tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ipInfo);
+char strIp [50];
+char strNm [50];
+char strGw [50];
+
+sprintf(strIp, IPSTR,IP2STR(&ipInfo.ip));
+sprintf(strNm, IPSTR,IP2STR(&ipInfo.netmask));
+sprintf(strGw, IPSTR,IP2STR(&ipInfo.gw));
+mg_rpc_send_responsef(ri, "{ status: %d, ip: %Q, netmask: %Q, gw: %Q }", 200, strIp, strNm, strGw);
+
+}
+
 esp_err_t mgos_wifi_setup_rpc_start()
 {
   LOG(LL_INFO, ("Wifi RPC handlers start"));
@@ -147,6 +169,7 @@ esp_err_t mgos_wifi_setup_rpc_start()
     struct mg_rpc *c = mgos_rpc_get_global();
     mg_rpc_add_handler(c, "Wifi.Test", "{ssid: %Q, pass: %Q, user: %Q}", mgos_wifi_setup_test_rpc_handler, NULL);
     mg_rpc_add_handler(c, "Wifi.Save", "{ssid: %Q, pass: %Q, user: %Q}", mgos_wifi_setup_save_rpc_handler, NULL);
+    mg_rpc_add_handler(c, "Wifi.GetInfo", NULL, mgos_wifi_setup_get_info_rpc_handler, NULL);
     b_wifi_setup_rpc_init = true;
     return ESP_OK;
   }

@@ -42,12 +42,17 @@ var Wifi = {
     Wifi.Scanning = new Wifi._msg_proto('scanning');
     Wifi.Connecting = new Wifi._msg_proto('connecting');
     Wifi.Creds = new Wifi._msg_proto('credswrapper');
+    Wifi.Edit = new Wifi._msg_proto('editwrapper');
     Wifi.List = new Wifi._msg_proto('networkswrapper');
     Wifi.Progress = new Wifi._msg_proto('wifiprogress');
     // Modal close functionality
     document.onclick = function(e) {
       if (e.target == Wifi.Creds.$el) {
         Wifi.Creds.hide();
+      }
+      if (e.target == Wifi.Edit.$el) {
+        document.getElementById("collapse-ip-info").checked = false;
+        Wifi.Edit.hide();
       }
     };
     // Get current configured SSID (if any)
@@ -75,6 +80,7 @@ var Wifi = {
     Wifi.Error.hide();
     Wifi.Success.hide();
     Wifi.Creds.hide();
+    Wifi.Edit.hide();
     Wifi.List.hide();
     Wifi.Buttons.disableAll();
     Wifi.Scanning.show();
@@ -149,6 +155,7 @@ var Wifi = {
   Success: {},
   Scanning: {},
   Creds: {},
+  Edit: {},
   List: {},
   Progress: {},
   rssiToStrength: function(rssi) {
@@ -225,6 +232,18 @@ var Wifi = {
     }
   },
   editNetwork: function(network) {
+    Wifi.rpcCall('GET','Wifi.GetInfo', 'Get IP information', null, function(resp){
+      if (resp.status !== 200) {
+        console.log("Cannot get IP information");
+      }else{
+        document.getElementById('tdIp').innerHTML = resp.ip;
+        document.getElementById('tdNm').innerHTML = resp.netmask;
+        document.getElementById('tdGw').innerHTML = resp.gw;
+        document.getElementById('editNetworkName').innerHTML = "SSID: " + network;
+        Wifi.Edit.show();
+        Wifi.Buttons._all.forget.enable();
+      }
+    });
     console.log(network);
   },
   Buttons: {
@@ -258,7 +277,7 @@ var Wifi = {
       };
     },
     _all: {},
-    _ids: ['scan', 'save', 'test'],
+    _ids: ['scan', 'save', 'test', 'forget'],
     init: function() {
       for (var i = 0; i < Wifi.Buttons._ids.length; i++) {
         var elID = Wifi.Buttons._ids[i];
@@ -347,6 +366,9 @@ var Wifi = {
         return;
       }
     );
+  },
+  forget: function(){
+    console.log('Forget ' + Wifi.configSSID);
   }
 };
 

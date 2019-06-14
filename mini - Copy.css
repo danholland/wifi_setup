@@ -27,7 +27,7 @@ html,
 body {
   margin: 0;
   color: #212121;
-  background: #fff;
+  background: #eeeeee;
 }
 
 article,
@@ -1879,20 +1879,22 @@ mark.inline-block {
 
 ul {
   display: table;
-  background-color: #fff;
-  color: #000;
+  background-color: #aed6f1;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   font-weight: 500;
   font-size: 20px;
   line-height: 22px;
   letter-spacing: 1px;
   overflow: hidden;
   width: 100%;
-  margin: 0 0 30px 0;
+  margin: 30px 0 30px 0;
+  box-shadow: 0px 10px 40px 0px rgba(0, 0, 0, 0.15);
   list-style: none;
 }
 
 li {
-  background-color: #fff;
+  background-color: #3F51B5;
   padding: 20px 23px 20px 23px;
   margin: 0 0 0 0;
   cursor: pointer;
@@ -1901,11 +1903,11 @@ li {
 }
 
 li:hover {
-  background-color: #ECEFF1;
+  background-color: #283593;
   transition: all 50ms ease-in-out;
 }
 li:hover::before {
-  background-color: #ECEFF1;
+  background-color: #283593;
   transition: all 50ms ease-in-out;
 }
 
@@ -1942,9 +1944,4 @@ li:active {
 /* Custom extras */
 .net-connected {
   background-color: #16a085;
-}
-
-#networkswrapper {
-  display: block;
-  padding: 0;
 }
