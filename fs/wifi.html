@@ -61,8 +61,7 @@
           </div>
         </fieldset>
         <div class="row">
-          <div><button id="test">Test</button></div>
-          <div><button class="tertiary" id="save">Save</button></div>
+          <div><button class="primary" id="connect">Connect</button></div>
         </div>
       </div>
     </div>
@@ -74,29 +73,35 @@
         </div>
         <div class="section">
           <div class="collapse">
-            <input type="checkbox" id="collapse-ip-info" aria-hidden="true">
-            <label for="collapse-ip-info" aria-hidden="true">IP Information</label>
+            <input type="checkbox" id="collapse-ip-info" aria-hidden="true" />
+            <label for="collapse-ip-info" aria-hidden="true"
+              >IP Information</label
+            >
             <div>
               <table class="horizontal">
                 <thead>
-                <tr>
-                  <th>IP Address</th>
-                  <th>Network Mask</th>
-                  <th>Gateway</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr style="border:0px;">
-                  <td id="tdIp" data-label="IP Address"></td>
-                  <td id="tdNm" data-label="Network Mask"></td>
-                  <td id="tdGw" data-label="Gateway"></td>
-                </tr>
-              </tbody>
+                  <tr>
+                    <th>IP Address</th>
+                    <th>Network Mask</th>
+                    <th>Gateway</th>
+                    <th>DNS 1</th>
+                    <th>DNS 2</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style="border:0px;">
+                    <td id="tdIp" data-label="IP Address"></td>
+                    <td id="tdNm" data-label="Network Mask"></td>
+                    <td id="tdGw" data-label="Gateway"></td>
+                    <td id="tdDns1" data-label="DNS 1"></td>
+                    <td id="tdDns2" data-label="DNS 2"></td>
+                  </tr>
+                </tbody>
               </table>
             </div>
           </div>
         </div>
-        <div class="row"> 
+        <div class="row">
           <div><button id="forget">Forget</button></div>
         </div>
       </div>

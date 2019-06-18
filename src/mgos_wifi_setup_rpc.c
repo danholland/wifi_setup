@@ -61,13 +61,13 @@ static void check_connected_cb(void *arg)
   return;
 }
 
-static void mgos_wifi_setup_test_rpc_handler(struct mg_rpc_request_info *ri, void *cb_arg,
-                                             struct mg_rpc_frame_info *fi,
-                                             struct mg_str args)
+static void mgos_wifi_setup_connect_rpc_handler(struct mg_rpc_request_info *ri, void *cb_arg,
+                                                struct mg_rpc_frame_info *fi,
+                                                struct mg_str args)
 {
-  LOG(LL_INFO, ("Wifi.Test RPC Handler Parsing JSON: %.*s\n", args.len, args.p));
+  LOG(LL_INFO, ("Wifi.Connect RPC Handler Parsing JSON: %.*s\n", args.len, args.p));
   struct mgos_config_wifi_sta cfg = {0};
-  json_scanf(args.p, args.len, ri->args_fmt, &cfg.ssid, &cfg.pass, &cfg.user);
+  json_scanf(args.p, args.len, ri->args_fmt, &cfg.ssid, &cfg.pass, &cfg.user, &cfg.ip, &cfg.netmask, &cfg.gw);
   cfg.enable = true;
   char *msg = NULL;
   if (!mgos_wifi_validate_sta_cfg(&cfg, &msg))
@@ -89,67 +89,34 @@ static void mgos_wifi_setup_test_rpc_handler(struct mg_rpc_request_info *ri, voi
   (void)fi;
 }
 
-static void mgos_wifi_setup_save_rpc_handler(struct mg_rpc_request_info *ri, void *cb_arg,
-                                             struct mg_rpc_frame_info *fi,
-                                             struct mg_str args)
-{
-  LOG(LL_INFO, ("Wifi.Save RPC Handler Parsing JSON: %.*s\n", args.len, args.p));
-  struct mgos_config_wifi_sta cfg = {0};
-  json_scanf(args.p, args.len, ri->args_fmt, &cfg.ssid, &cfg.pass, &cfg.user);
-  cfg.enable = true;
-  char *msg = NULL;
-  if (!mgos_wifi_validate_sta_cfg(&cfg, &msg))
-  {
-    free((char *)cfg.ssid);
-    free((char *)cfg.pass);
-    free((char *)cfg.user);
-    mg_rpc_send_errorf(ri, -1, msg);
-    free(msg);
-    return false;
-  }
-
-  mgos_sys_config_set_wifi_sta_enable(true);
-  mgos_sys_config_set_wifi_sta_ssid(cfg.ssid);
-  mgos_sys_config_set_wifi_sta_pass(cfg.pass);
-
-  char *err = NULL;
-  if (!save_cfg(&mgos_sys_config, &err))
-  {
-    LOG(LL_ERROR, ("Copy STA Values, Save Config Error: %s", err));
-    mg_rpc_send_errorf(ri, -1, err);
-    free(err);
-  }
-  else
-  {
-    mg_rpc_send_responsef(ri, "{ status: %d, response: %Q }", 200, "saved");
-  }
-
-  free((char *)cfg.ssid);
-  free((char *)cfg.pass);
-  free((char *)cfg.user);
-  (void)cb_arg;
-  (void)fi;
-}
-
 static void mgos_wifi_setup_get_info_rpc_handler(struct mg_rpc_request_info *ri, void *cb_arg,
-                                             struct mg_rpc_frame_info *fi,
-                                             struct mg_str args)
+                                                 struct mg_rpc_frame_info *fi,
+                                                 struct mg_str args)
 {
-  
-  
-  tcpip_adapter_ip_info_t ipInfo; 
-    	
-// IP address.
-tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ipInfo);
-char strIp [50];
-char strNm [50];
-char strGw [50];
 
-sprintf(strIp, IPSTR,IP2STR(&ipInfo.ip));
-sprintf(strNm, IPSTR,IP2STR(&ipInfo.netmask));
-sprintf(strGw, IPSTR,IP2STR(&ipInfo.gw));
-mg_rpc_send_responsef(ri, "{ status: %d, ip: %Q, netmask: %Q, gw: %Q }", 200, strIp, strNm, strGw);
+  tcpip_adapter_ip_info_t ipInfo;
+  tcpip_adapter_dns_info_t dnsInfo1;
+  tcpip_adapter_dns_info_t dnsInfo2;
 
+  // IP address.
+  tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ipInfo);
+
+  // DNS Server
+  tcpip_adapter_get_dns_info(TCPIP_ADAPTER_IF_STA, TCPIP_ADAPTER_DNS_MAIN, &dnsInfo1);
+  tcpip_adapter_get_dns_info(TCPIP_ADAPTER_IF_STA, TCPIP_ADAPTER_DNS_MAIN, &dnsInfo2);
+
+  char strIp[20];
+  char strNm[20];
+  char strGw[20];
+  char strDns1[20];
+  char strDns2[20];
+
+  sprintf(strIp, IPSTR, IP2STR(&ipInfo.ip));
+  sprintf(strNm, IPSTR, IP2STR(&ipInfo.netmask));
+  sprintf(strGw, IPSTR, IP2STR(&ipInfo.gw));
+  sprintf(strDns1, IPSTR, IP2STR(ip_2_ip4(&dnsInfo1.ip)));
+  sprintf(strDns2, IPSTR, IP2STR(ip_2_ip4(&dnsInfo2.ip)));
+  mg_rpc_send_responsef(ri, "{ status: %d, ip: %Q, netmask: %Q, gw: %Q, dns1: %Q, dns2: %Q }", 200, strIp, strNm, strGw, strDns1, strDns2);
 }
 
 esp_err_t mgos_wifi_setup_rpc_start()
@@ -167,8 +134,7 @@ esp_err_t mgos_wifi_setup_rpc_start()
     }
 
     struct mg_rpc *c = mgos_rpc_get_global();
-    mg_rpc_add_handler(c, "Wifi.Test", "{ssid: %Q, pass: %Q, user: %Q}", mgos_wifi_setup_test_rpc_handler, NULL);
-    mg_rpc_add_handler(c, "Wifi.Save", "{ssid: %Q, pass: %Q, user: %Q}", mgos_wifi_setup_save_rpc_handler, NULL);
+    mg_rpc_add_handler(c, "Wifi.Connect", "{ssid: %Q, pass: %Q, user: %Q}", mgos_wifi_setup_connect_rpc_handler, NULL);
     mg_rpc_add_handler(c, "Wifi.GetInfo", NULL, mgos_wifi_setup_get_info_rpc_handler, NULL);
     b_wifi_setup_rpc_init = true;
     return ESP_OK;

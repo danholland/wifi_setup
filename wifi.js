@@ -49,10 +49,12 @@ var Wifi = {
     document.onclick = function(e) {
       if (e.target == Wifi.Creds.$el) {
         Wifi.Creds.hide();
+        Wifi.Buttons._all.scan.enable();
       }
       if (e.target == Wifi.Edit.$el) {
-        document.getElementById("collapse-ip-info").checked = false;
+        document.getElementById('collapse-ip-info').checked = false;
         Wifi.Edit.hide();
+        Wifi.Buttons._all.scan.enable();
       }
     };
     // Get current configured SSID (if any)
@@ -145,6 +147,7 @@ var Wifi = {
         } else {
           Wifi.Scanning.hide();
           Wifi.Error.show('No networks found');
+          Wifi.Progress.hide();
         }
         Wifi.Buttons._all.scan.enable();
       }
@@ -205,10 +208,11 @@ var Wifi = {
     var passwrapper = document.getElementById('wpasswrapper');
     document.getElementById('wuser').value = '';
     document.getElementById('wpass').value = '';
+    document.getElementById('wpass').disabled = false;
+    document.getElementById('wuser').disabled = false;
     userwrapper.style.display = 'none';
     passwrapper.style.display = 'none';
-    Wifi.Buttons._all.test.disable();
-    Wifi.Buttons._all.save.disable();
+    Wifi.Buttons._all.connect.disable();
     var found = false;
     Wifi.Networks.forEach(function(net) {
       if (net.ssid !== network) {
@@ -232,19 +236,23 @@ var Wifi = {
     }
   },
   editNetwork: function(network) {
-    Wifi.rpcCall('GET','Wifi.GetInfo', 'Get IP information', null, function(resp){
+    Wifi.rpcCall('GET', 'Wifi.GetInfo', 'Get IP information', null, function(
+      resp
+    ) {
       if (resp.status !== 200) {
-        console.log("Cannot get IP information");
-      }else{
+        console.log('Cannot get IP information');
+      } else {
         document.getElementById('tdIp').innerHTML = resp.ip;
         document.getElementById('tdNm').innerHTML = resp.netmask;
         document.getElementById('tdGw').innerHTML = resp.gw;
-        document.getElementById('editNetworkName').innerHTML = "SSID: " + network;
+        document.getElementById('tdDns1').innerHTML = resp.dns1;
+        document.getElementById('tdDns2').innerHTML = resp.dns2;
+        document.getElementById('editNetworkName').innerHTML =
+          'SSID: ' + network;
         Wifi.Edit.show();
         Wifi.Buttons._all.forget.enable();
       }
     });
-    console.log(network);
   },
   Buttons: {
     _proto: function(elID, clickCB) {
@@ -277,7 +285,7 @@ var Wifi = {
       };
     },
     _all: {},
-    _ids: ['scan', 'save', 'test', 'forget'],
+    _ids: ['scan', 'connect', 'forget'],
     init: function() {
       for (var i = 0; i < Wifi.Buttons._ids.length; i++) {
         var elID = Wifi.Buttons._ids[i];
@@ -295,39 +303,7 @@ var Wifi = {
       }
     }
   },
-  save: function() {
-    var ssid = Wifi.currentSSID;
-    var user = document.getElementById('wuser').value;
-    var pass = document.getElementById('wpass').value;
-    Wifi.Info.hide();
-    Wifi.Success.hide();
-    if (!ssid || ssid.length < 1) {
-      Wifi.Error.show('You must select a network');
-      return;
-    }
-    document.getElementById('wpass').disabled = true;
-    document.getElementById('wuser').disabled = true;
-    Wifi.Buttons.disableAll();
-    Wifi.rpcCall(
-      'POST',
-      'Wifi.Save',
-      'Saving...',
-      { ssid: ssid, pass: pass, user: user },
-      function(resp) {
-        if (resp.status !== 200) {
-          Wifi.Error.show(resp.response);
-          document.getElementById('wpass').disabled = false;
-          document.getElementById('wuser').disabled = false;
-        } else {
-          Wifi.Success.show('WiFi settings saved.');
-          Wifi.Creds.hide();
-          Wifi.Buttons.enableAll();
-          Wifi.scan();
-        }
-      }
-    );
-  },
-  test: function() {
+  connect: function() {
     var ssid = Wifi.currentSSID;
     var user = document.getElementById('wuser').value;
     var pass = document.getElementById('wpass').value;
@@ -346,7 +322,7 @@ var Wifi = {
     document.getElementById('wuser').disabled = true;
     Wifi.rpcCall(
       'POST',
-      'Wifi.Test',
+      'Wifi.Connect',
       'Attempting to connect...',
       { ssid: ssid, pass: pass, user: user },
       function(resp) {
@@ -357,18 +333,59 @@ var Wifi = {
           Wifi.Error.show(resp.response);
           document.getElementById('wpass').disabled = false;
         } else {
-          Wifi.Success.show(
-            'WiFi successfully connected. Click Save to commit.'
-          );
-          Wifi.Buttons._all.save.enable();
+          Wifi.Success.show('WiFi successfully connected.');
+          Wifi.saveConfig();
         }
-        Wifi.Buttons._all.test.enable();
+        Wifi.Buttons.enableAll();
         return;
       }
     );
   },
-  forget: function(){
-    console.log('Forget ' + Wifi.configSSID);
+  saveConfig: function() {
+    var cfg = { config: { wifi: { sta: {} } } };
+    cfg.config.wifi.sta.enable = true;
+    cfg.config.wifi.sta.ssid = Wifi.currentSSID;
+    cfg.config.wifi.sta.user = document.getElementById('wuser').value;
+    cfg.config.wifi.sta.pass = document.getElementById('wpass').value;
+    Wifi.rpcCall('POST', 'Config.Set', 'Saving config', cfg, function(resp) {
+      if (resp.saved) {
+        Wifi.rpcCall('POST', 'Config.Save', 'Saving config', null, function(
+          resp
+        ) {
+          console.log(resp);
+          Wifi.Creds.hide();
+          Wifi.Buttons.enableAll();
+          Wifi.configSSID = ssid;
+          Wifi.scan();
+        });
+      }
+    });
+    return;
+  },
+  forget: function() {
+    var ssid = Wifi.currentSSID;
+    Wifi.Buttons._all.forget.disable();
+    Wifi.rpcCall(
+      'POST',
+      'Config.Set',
+      'Attempting to forget......',
+      { config: { wifi: null } },
+      function(resp) {
+        if (resp.saved) {
+          Wifi.rpcCall('POST', 'Config.Save', 'Saving config', null, function(
+            resp
+          ) {
+            console.log(resp);
+            Wifi.Edit.hide();
+            Wifi.Buttons.enableAll();
+            Wifi.configSSID = ssid;
+            Wifi.scan();
+          });
+        }
+        return;
+      }
+    );
+    return;
   }
 };
 
