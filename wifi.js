@@ -355,7 +355,7 @@ var Wifi = {
           console.log(resp);
           Wifi.Creds.hide();
           Wifi.Buttons.enableAll();
-          Wifi.configSSID = ssid;
+          Wifi.configSSID = Wifi.currentSSID;
           Wifi.scan();
         });
       }
@@ -378,7 +378,7 @@ var Wifi = {
             console.log(resp);
             Wifi.Edit.hide();
             Wifi.Buttons.enableAll();
-            Wifi.configSSID = ssid;
+            Wifi.configSSID = Wifi.currentSSID;
             Wifi.scan();
           });
         }
