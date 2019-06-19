@@ -9,100 +9,192 @@
   </head>
   <body>
     <header>
-      <h5>Configure Wifi settings</h5>
+      <h5 style="float: left;">Configure Wifi settings</h5>
+      <a href="#" class="home-icon" id="homeLink"
+        ><span class="icon-home inverse"></span
+      ></a>
     </header>
     <div id="wifiprogress" class="progress">
       <div class="indeterminate"></div>
     </div>
-    <div class="row cols-sm-12 cols-md-6">
-      <div id="scanning" class="card fluid info" style="display: none;">
-        <div class="section" style="padding: 0px;">
-          <p>
-            <span class="spinner primary list-view-icon"></span>Scanning for
-            wireless networks...
-          </p>
+    <div class="container">
+      <div class="row">
+        <div
+          id="scanning"
+          class="card fluid info"
+          style="display: none; width: 100%;"
+        >
+          <div class="section" style="padding: 0px;">
+            <p>
+              <span class="scanner"></span>Scanning for wireless networks...
+            </p>
+          </div>
         </div>
-      </div>
-      <div id="connecting" class="card fluid info" style="display: none;">
-        <div class="section" style="padding: 0px;">
-          <p>
-            <span class="spinner primary list-view-icon"></span>Attempting to
-            connect...
-          </p>
+        <div
+          id="connecting"
+          class="card fluid info"
+          style="display: none; width: 100%;"
+        >
+          <div class="section" style="padding: 0px;">
+            <p><span class="scanner"></span>Attempting to connect...</p>
+          </div>
         </div>
+        <div
+          id="error"
+          class="card fluid error"
+          style="display: none; width: 100%;"
+        ></div>
+        <div
+          id="info"
+          class="card fluid info"
+          style="display: none; width: 100%;"
+        ></div>
+        <div
+          id="success"
+          class="card fluid success"
+          style="display: none;"
+        ></div>
       </div>
-      <div id="error" class="card fluid error" style="display: none;"></div>
-      <div id="info" class="card fluid info" style="display: none;"></div>
-      <div id="success" class="card fluid success" style="display: none;"></div>
-    </div>
 
-    <div class="row">
-      <div id="networkswrapper" class="col-sm-12 col-md-6">
-        <div class="list-view">
-          <ul id="networklist"></ul>
+      <div class="row">
+        <div id="networkswrapper" class="col-sm-12 col-md-6">
+          <div class="list-view">
+            <ul id="networklist"></ul>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="row cols-sm-4">
-      <div><button class="primary" id="scan">Scan</button></div>
-    </div>
-    <div class="modal" id="credswrapper">
-      <div class="modal-content">
-        <fieldset>
-          <legend>Enter credentials</legend>
-          <div id="wuserwrapper">
+      <div class="row cols-sm-4">
+        <div><button class="primary" id="scan">Scan</button></div>
+      </div>
+      <div class="modal" id="connectwrapper">
+        <div class="modal-content">
+          <h4 class="section" id="connectNetworkName"></h4>
+          <div id="wuserwrapper" class="group">
+            <input
+              type="text"
+              name="wuser"
+              id="wuser"
+              autocomplete="off"
+              placeholder="&nbsp;"
+              required="required"
+            />
+            <div class="bar"></div>
             <label for="wuser">Username</label>
-            <input type="text" name="wuser" id="wuser" autocomplete="off" />
           </div>
-          <div id="wpasswrapper">
+          <div id="wpasswrapper" class="group">
+            <input
+              type="password"
+              name="wpass"
+              id="wpass"
+              autocomplete="off"
+              placeholder="&nbsp;"
+              required="required"
+            />
+            <div class="bar"></div>
             <label for="wpass">Password</label>
-            <input type="password" name="wpass" id="wpass" autocomplete="off" />
           </div>
-        </fieldset>
-        <div class="row">
-          <div><button class="primary" id="connect">Connect</button></div>
-        </div>
-      </div>
-    </div>
-    <div class="modal" id="editwrapper">
-      <div class="modal-content">
-        <h4 class="section">Network Configuration</h4>
-        <div class="section">
-          <p id="editNetworkName"></p>
-        </div>
-        <div class="section">
-          <div class="collapse">
-            <input type="checkbox" id="collapse-ip-info" aria-hidden="true" />
-            <label for="collapse-ip-info" aria-hidden="true"
-              >IP Information</label
-            >
-            <div>
-              <table class="horizontal">
-                <thead>
-                  <tr>
-                    <th>IP Address</th>
-                    <th>Network Mask</th>
-                    <th>Gateway</th>
-                    <th>DNS 1</th>
-                    <th>DNS 2</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr style="border:0px;">
-                    <td id="tdIp" data-label="IP Address"></td>
-                    <td id="tdNm" data-label="Network Mask"></td>
-                    <td id="tdGw" data-label="Gateway"></td>
-                    <td id="tdDns1" data-label="DNS 1"></td>
-                    <td id="tdDns2" data-label="DNS 2"></td>
-                  </tr>
-                </tbody>
-              </table>
+          <div class="section">
+            <label for="staticIpSelect">IP Address</label>
+            <select name="staticIpSelect" id="staticIpSelect">
+              <option value="dhcp" selected="selected">Automatic</option>
+              <option value="static">Static</option>
+            </select>
+          </div>
+          <div class="section" id="staticIpDetails" style="display: none;">
+            <div class="group">
+              <input
+                type="text"
+                name="staticIp"
+                id="staticIp"
+                autocomplete="off"
+                placeholder="&nbsp;"
+                required="required"
+              />
+              <div class="bar"></div>
+              <label for="staticIp">IP Address</label>
+            </div>
+            <div class="group">
+              <input
+                type="text"
+                name="staticNetmask"
+                id="staticNetmask"
+                autocomplete="off"
+                placeholder="&nbsp;"
+                required="required"
+              />
+              <div class="bar"></div>
+              <label for="staticNetmask">Network Mask</label>
+            </div>
+            <div class="group">
+              <input
+                type="text"
+                name="staticGw"
+                id="staticGw"
+                autocomplete="off"
+                placeholder="&nbsp;"
+                required="required"
+              />
+              <div class="bar"></div>
+              <label for="staticGw">Gateway</label>
+            </div>
+            <div class="group">
+              <input
+                type="text"
+                name="staticDns"
+                id="staticDns"
+                autocomplete="off"
+                placeholder="&nbsp;"
+                required="required"
+              />
+              <div class="bar"></div>
+              <label for="staticDns">DNS Server</label>
             </div>
           </div>
+          <div class="row">
+            <div><button class="primary" id="connect">Connect</button></div>
+          </div>
         </div>
-        <div class="row">
-          <div><button id="forget">Forget</button></div>
+      </div>
+      <div class="modal" id="editwrapper">
+        <div class="modal-content">
+          <h4 class="section">Network Configuration</h4>
+          <div class="section">
+            <p id="editNetworkName"></p>
+          </div>
+          <div class="section">
+            <div class="collapse">
+              <input type="checkbox" id="collapse-ip-info" aria-hidden="true" />
+              <label for="collapse-ip-info" aria-hidden="true"
+                >IP Information</label
+              >
+              <div>
+                <table class="horizontal">
+                  <thead>
+                    <tr>
+                      <th>IP Address</th>
+                      <th>Network Mask</th>
+                      <th>Gateway</th>
+                      <th>DNS 1</th>
+                      <th>DNS 2</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr style="border:0px;">
+                      <td id="tdIp" data-label="IP Address"></td>
+                      <td id="tdNm" data-label="Network Mask"></td>
+                      <td id="tdGw" data-label="Gateway"></td>
+                      <td id="tdDns1" data-label="DNS 1"></td>
+                      <td id="tdDns2" data-label="DNS 2"></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div><button id="forget">Forget</button></div>
+          </div>
         </div>
       </div>
     </div>

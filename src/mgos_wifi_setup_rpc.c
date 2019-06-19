@@ -67,7 +67,7 @@ static void mgos_wifi_setup_connect_rpc_handler(struct mg_rpc_request_info *ri, 
 {
   LOG(LL_INFO, ("Wifi.Connect RPC Handler Parsing JSON: %.*s\n", args.len, args.p));
   struct mgos_config_wifi_sta cfg = {0};
-  json_scanf(args.p, args.len, ri->args_fmt, &cfg.ssid, &cfg.pass, &cfg.user, &cfg.ip, &cfg.netmask, &cfg.gw);
+  json_scanf(args.p, args.len, ri->args_fmt, &cfg.ssid, &cfg.pass, &cfg.user, &cfg.ip, &cfg.netmask, &cfg.gw, &cfg.nameserver);
   cfg.enable = true;
   char *msg = NULL;
   if (!mgos_wifi_validate_sta_cfg(&cfg, &msg))
@@ -103,7 +103,7 @@ static void mgos_wifi_setup_get_info_rpc_handler(struct mg_rpc_request_info *ri,
 
   // DNS Server
   tcpip_adapter_get_dns_info(TCPIP_ADAPTER_IF_STA, TCPIP_ADAPTER_DNS_MAIN, &dnsInfo1);
-  tcpip_adapter_get_dns_info(TCPIP_ADAPTER_IF_STA, TCPIP_ADAPTER_DNS_MAIN, &dnsInfo2);
+  tcpip_adapter_get_dns_info(TCPIP_ADAPTER_IF_STA, TCPIP_ADAPTER_DNS_BACKUP, &dnsInfo2);
 
   char strIp[20];
   char strNm[20];

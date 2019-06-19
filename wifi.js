@@ -41,14 +41,16 @@ var Wifi = {
     Wifi.Success = new Wifi._msg_proto('success');
     Wifi.Scanning = new Wifi._msg_proto('scanning');
     Wifi.Connecting = new Wifi._msg_proto('connecting');
-    Wifi.Creds = new Wifi._msg_proto('credswrapper');
+    Wifi.Connect = new Wifi._msg_proto('connectwrapper');
     Wifi.Edit = new Wifi._msg_proto('editwrapper');
     Wifi.List = new Wifi._msg_proto('networkswrapper');
     Wifi.Progress = new Wifi._msg_proto('wifiprogress');
+    Wifi.Static = new Wifi._msg_proto('staticIpDetails');
+    Wifi.Home = new Wifi._msg_proto('homeLink');
     // Modal close functionality
     document.onclick = function(e) {
-      if (e.target == Wifi.Creds.$el) {
-        Wifi.Creds.hide();
+      if (e.target == Wifi.Connect.$el) {
+        Wifi.Connect.hide();
         Wifi.Buttons._all.scan.enable();
       }
       if (e.target == Wifi.Edit.$el) {
@@ -57,8 +59,20 @@ var Wifi = {
         Wifi.Buttons._all.scan.enable();
       }
     };
+
+    // DHCP/Static IP option
+    document.getElementById('staticIpSelect').onchange = function(e) {
+      if (e.target.value === 'dhcp') {
+        Wifi.Static.hide();
+      } else if (e.target.value === 'static') {
+        Wifi.Static.show();
+      }
+    };
+
     // Get current configured SSID (if any)
     Wifi.getConfig();
+    // Set Home button if configured
+    Wifi.setupHome();
   },
   getConfig: function() {
     Wifi.rpcCall(
@@ -77,11 +91,26 @@ var Wifi = {
       }
     );
   },
+  setupHome: function() {
+    Wifi.Home.hide();
+    Wifi.rpcCall(
+      'POST',
+      'Config.Get',
+      'Getting home page',
+      { key: 'wifi.rpc.home' },
+      function(resp) {
+        if (resp.status === 200) {
+          Wifi.Home.show();
+          Wifi.Home.href = '/index.html';
+        }
+      }
+    );
+  },
   scan: function() {
     Wifi.Info.hide();
     Wifi.Error.hide();
     Wifi.Success.hide();
-    Wifi.Creds.hide();
+    Wifi.Connect.hide();
     Wifi.Edit.hide();
     Wifi.List.hide();
     Wifi.Buttons.disableAll();
@@ -157,7 +186,7 @@ var Wifi = {
   Info: {},
   Success: {},
   Scanning: {},
-  Creds: {},
+  Connect: {},
   Edit: {},
   List: {},
   Progress: {},
@@ -181,7 +210,7 @@ var Wifi = {
       }
 
       if (httpRequest.status !== 200) {
-        console.log('rpcCall httpRequest status is NOT 200!', httpRequest);
+        //console.log('rpcCall httpRequest status is NOT 200!', httpRequest);
 
         if (httpRequest.responseText && httpRequest.responseText.length > 0) {
           Wifi.Error.show(
@@ -195,7 +224,7 @@ var Wifi = {
         }
         return;
       }
-
+      console.log(httpRequest);
       callback(JSON.parse(httpRequest.responseText));
     };
     httpRequest.open(method, '/rpc/' + rpc);
@@ -206,6 +235,7 @@ var Wifi = {
     Wifi.currentSSID = network;
     var userwrapper = document.getElementById('wuserwrapper');
     var passwrapper = document.getElementById('wpasswrapper');
+    document.getElementById('connectNetworkName').innerHTML = network;
     document.getElementById('wuser').value = '';
     document.getElementById('wpass').value = '';
     document.getElementById('wpass').disabled = false;
@@ -220,13 +250,13 @@ var Wifi = {
       }
       var auth = parseInt(net.auth);
       if (auth === 0) {
-        Wifi.Creds.hide();
+        Wifi.Connect.hide();
       } else if (auth === 5) {
-        Wifi.Creds.show();
+        Wifi.Connect.show();
         userwrapper.style.display = 'block';
         passwrapper.style.display = 'block';
       } else {
-        Wifi.Creds.show();
+        Wifi.Connect.show();
         passwrapper.style.display = 'block';
       }
       found = true;
@@ -307,6 +337,16 @@ var Wifi = {
     var ssid = Wifi.currentSSID;
     var user = document.getElementById('wuser').value;
     var pass = document.getElementById('wpass').value;
+    var ip = document.getElementById('staticIp').value;
+    var netmask = document.getElementById('staticNetmask').value;
+    var gw = document.getElementById('staticGw').value;
+    var dns = document.getElementById('staticDns').value;
+    if (document.getElementById('staticIpSelect').value === 'dhcp') {
+      ip = '';
+      netmask = '';
+      gw = '';
+      dns = '';
+    }
     Wifi.Error.hide();
     if (!ssid || ssid.length < 1) {
       Wifi.Info.hide();
@@ -324,7 +364,15 @@ var Wifi = {
       'POST',
       'Wifi.Connect',
       'Attempting to connect...',
-      { ssid: ssid, pass: pass, user: user },
+      {
+        ssid: ssid,
+        pass: pass,
+        user: user,
+        ip: ip,
+        netmask: netmask,
+        gw: gw,
+        nameserver: dns
+      },
       function(resp) {
         Wifi.Info.hide();
         Wifi.Error.hide();
@@ -347,13 +395,19 @@ var Wifi = {
     cfg.config.wifi.sta.ssid = Wifi.currentSSID;
     cfg.config.wifi.sta.user = document.getElementById('wuser').value;
     cfg.config.wifi.sta.pass = document.getElementById('wpass').value;
+    cfg.config.wifi.sta.ip = document.getElementById('staticIp').value;
+    cfg.config.wifi.sta.netmask = document.getElementById(
+      'staticNetmask'
+    ).value;
+    cfg.config.wifi.sta.gw = document.getElementById('staticGw').value;
+    cfg.config.wifi.sta.nameserver = document.getElementById('staticDns').value;
     Wifi.rpcCall('POST', 'Config.Set', 'Saving config', cfg, function(resp) {
       if (resp.saved) {
         Wifi.rpcCall('POST', 'Config.Save', 'Saving config', null, function(
           resp
         ) {
           console.log(resp);
-          Wifi.Creds.hide();
+          Wifi.Connect.hide();
           Wifi.Buttons.enableAll();
           Wifi.configSSID = Wifi.currentSSID;
           Wifi.scan();
@@ -363,13 +417,27 @@ var Wifi = {
     return;
   },
   forget: function() {
-    var ssid = Wifi.currentSSID;
     Wifi.Buttons._all.forget.disable();
     Wifi.rpcCall(
       'POST',
       'Config.Set',
       'Attempting to forget......',
-      { config: { wifi: null } },
+      {
+        config: {
+          wifi: {
+            sta: {
+              enable: false,
+              ssid: '',
+              pass: '',
+              user: '',
+              ip: '',
+              netmask: '',
+              gw: '',
+              nameserver: ''
+            }
+          }
+        }
+      },
       function(resp) {
         if (resp.saved) {
           Wifi.rpcCall('POST', 'Config.Save', 'Saving config', null, function(
@@ -377,8 +445,10 @@ var Wifi = {
           ) {
             console.log(resp);
             Wifi.Edit.hide();
+            Wifi.Error.hide();
+            Wifi.Success.hide();
             Wifi.Buttons.enableAll();
-            Wifi.configSSID = Wifi.currentSSID;
+            Wifi.configSSID = null;
             Wifi.scan();
           });
         }

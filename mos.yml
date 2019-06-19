@@ -23,6 +23,12 @@ config_schema:
       20,
       { title: 'Timeout for connecting to a wifi network' },
     ]
+  - [
+      'wifi.rpc.home',
+      's',
+      '',
+      { title: 'URL for Home button on Wifi Settings page' },
+    ]
 
 tags:
   - js
