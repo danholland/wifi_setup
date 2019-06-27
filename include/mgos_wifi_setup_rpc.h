@@ -22,4 +22,4 @@
 
 esp_err_t mgos_wifi_setup_rpc_start();
 
-bool mgos_wifi_setup_rpc_init(void);
+bool mgos_wifi_setup_init(void);
