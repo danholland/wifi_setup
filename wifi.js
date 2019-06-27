@@ -81,6 +81,9 @@ var Wifi = {
       'Get config',
       { key: 'wifi.sta' },
       function(resp) {
+        if (resp.responseText.trim().length > 0) {
+          resp = JSON.parse(resp.responseText);
+        }
         if (resp.ssid && resp.ssid.length > 0) {
           Wifi.configSSID = resp.ssid;
         }
@@ -122,6 +125,7 @@ var Wifi = {
       'Scanning for wireless networks...',
       false,
       function(resp) {
+        resp = JSON.parse(resp.responseText);
         if (resp && resp.length > 0) {
           Wifi.SSIDs = [];
           Wifi.Networks = [];
@@ -224,8 +228,9 @@ var Wifi = {
         }
         return;
       }
-      console.log(httpRequest);
-      callback(JSON.parse(httpRequest.responseText));
+      //console.log(httpRequest);
+
+      callback(httpRequest);
     };
     httpRequest.open(method, '/rpc/' + rpc);
     httpRequest.setRequestHeader('Content-Type', 'application/json');
@@ -272,6 +277,7 @@ var Wifi = {
       if (resp.status !== 200) {
         console.log('Cannot get IP information');
       } else {
+        resp = JSON.parse(resp.responseText);
         document.getElementById('tdIp').innerHTML = resp.ip;
         document.getElementById('tdNm').innerHTML = resp.netmask;
         document.getElementById('tdGw').innerHTML = resp.gw;
@@ -378,10 +384,11 @@ var Wifi = {
         Wifi.Error.hide();
         Wifi.Connecting.hide();
         if (resp.status !== 200) {
-          Wifi.Error.show(resp.response);
+          Wifi.Error.show(resp.responseText);
           document.getElementById('wpass').disabled = false;
         } else {
           Wifi.Success.show('WiFi successfully connected.');
+          Wifi.Connect.hide();
           Wifi.saveConfig();
         }
         Wifi.Buttons.enableAll();
@@ -402,11 +409,11 @@ var Wifi = {
     cfg.config.wifi.sta.gw = document.getElementById('staticGw').value;
     cfg.config.wifi.sta.nameserver = document.getElementById('staticDns').value;
     Wifi.rpcCall('POST', 'Config.Set', 'Saving config', cfg, function(resp) {
+      resp = JSON.parse(resp.responseText);
       if (resp.saved) {
         Wifi.rpcCall('POST', 'Config.Save', 'Saving config', null, function(
           resp
         ) {
-          console.log(resp);
           Wifi.Connect.hide();
           Wifi.Buttons.enableAll();
           Wifi.configSSID = Wifi.currentSSID;
@@ -439,11 +446,11 @@ var Wifi = {
         }
       },
       function(resp) {
+        resp = JSON.parse(resp.responseText);
         if (resp.saved) {
           Wifi.rpcCall('POST', 'Config.Save', 'Saving config', null, function(
             resp
           ) {
-            console.log(resp);
             Wifi.Edit.hide();
             Wifi.Error.hide();
             Wifi.Success.hide();
